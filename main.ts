@@ -16,6 +16,17 @@ if (length < 1 || length > 160) {
   throw new Error(`Entry must be 1-160 characters, got ${length}.`);
 }
 
+// A line of only whitespace would pass the length guard but is not a
+// reply at all, and a line containing a newline would break the gate's
+// exactly-one-line requirement, so reject both instead of writing an
+// invalid entry.
+if (line.trim().length === 0) {
+  throw new Error("Entry must not be only white space.");
+}
+if (line.includes("\n") || line.includes("\r")) {
+  throw new Error("Entry must be exactly one line.");
+}
+
 mkdirSync("/output", { recursive: true });
 writeFileSync("/output/entry.txt", line, "utf8");
 console.log("Wrote /output/entry.txt");
